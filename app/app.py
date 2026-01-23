@@ -20,6 +20,6 @@ def index():
     """
     return "Ops automation target app is running", 200
 
-if __name__ == "__name__":
-    # 0.0.0.0으로 바인딩해야 Docker 컨테이너 외부에서 접근 가능
-    app.run(host="0.0.0.0", port=80)
+# if __name__ == "__name__":
+#     # 0.0.0.0으로 바인딩해야 Docker 컨테이너 외부에서 접근 가능
+#     app.run(host="0.0.0.0", port=80)

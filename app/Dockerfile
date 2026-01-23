@@ -19,4 +19,4 @@ COPY app.py .
 EXPOSE 80
 
 # 컨테이너 실행 시 Flask 앱 실행
-CMD ["python", "app.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:app"]
