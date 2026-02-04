@@ -48,3 +48,11 @@ yarn-error.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# =========================
+# Log
+# =========================
+nohub.out
+__pycache__/
+*.log
+.env
