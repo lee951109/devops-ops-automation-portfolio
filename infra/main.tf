@@ -68,6 +68,11 @@ data "aws_subnets" "default_vpc_subnets" {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
+
+  filter {
+    name   = "availability-zone"
+    values = ["ap-northeast-2a", "ap-northeast-2c"]
+  }
 }
 
 # EC2(Elastic Compute Cloud) 인스턴스 생성
