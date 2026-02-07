@@ -18,7 +18,7 @@ def handle_mention(body, say):
     user = body["event"]["user"]
     text = body["event"]["text"]
 
-    say(f"🔍 <@{user}>님, AWS 자원을 정밀 점검하고 있습니다... (v1.0)")
+    say(f"🔍 <@{user}>님, AWS 자원을 정밀 점검하고 있습니다... (v2.0)")
 
     try:
         # 1. cost_saver 함수 호출
