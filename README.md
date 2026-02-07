@@ -1,49 +1,109 @@
-# DevOps 운영 자동화 포트폴리오
+# 🤖 AWS Ops-Automation Portfolio
+> **Terraform + Python + Slack + GitHub Actions**를 활용한 비용 최적화 및 ChatOps 자동화 프로젝트
 
-이 프로젝트는 Kubernetes 없이,
-EC2 환경에서 실제 운영 자동화를 어떻게 구현할 수 있는지에 초점을 둔 포트폴리오다.
+![Python](https://img.shields.io/badge/Python-3.9-blue?logo=python)
+![Terraform](https://img.shields.io/badge/Terraform-1.0+-purple?logo=terraform)
+![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20EBS-orange?logo=amazon-aws)
+![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=github-actions)
+![Slack](https://img.shields.io/badge/ChatOps-Slack%20Bolt-4A154B?logo=slack)
 
-이미 Kubernetes와 GitOps는 다른 포트폴리오에서 충분히 다뤘기 때문에  
-이번에는 추상화를 줄이고,  
-운영 중 발생하는 문제를 Python 코드로 직접 감지하고 대응하는 데 집중한다.
+## 🏗️ Architecture Diagram
+아래 다이어그램은 본 프로젝트의 전체 자동화 흐름을 보여줍니다.
+```mermaid
+graph TD
+    %% 그룹 1: 개발 및 배포 (CI/CD)
+    subgraph Development ["🚀 CI/CD Pipeline"]
+        Dev[User / Developer]
+        Git["GitHub Repository"]
+        GHA["GitHub Actions"]
+    end
 
----
+    %% 그룹 2: 클라우드 인프라 (AWS)
+    subgraph Cloud ["☁️ AWS Infrastructure"]
+        subgraph VPC ["Standard VPC"]
+            EC2["🖥️ EC2 Instance <br/> (Python OpsBot / Systemd)"]
+            Role["🛡️ IAM Role <br/> (EC2 ReadOnly)"]
+        end
+        AWSRes["📦 AWS Resources <br/> (EBS, EIP, etc.)"]
+    end
 
-## 프로젝트 목표
+    %% 그룹 3: 인터페이스 (ChatOps)
+    subgraph Interface ["📱 Operations Interface"]
+        Slack["Slack App Server"]
+        Chat["User (Slack Mobile/PC)"]
+    end
 
-- 운영 중인 서버 상태를 코드로 감지한다
-- 장애 발생 시 사람이 아닌 코드가 먼저 반응한다
-- 비용을 고려한 운영 종료(destroy)까지 포함한다
+    %% 연결 흐름 (Flows)
+    %% 1. 배포 과정
+    Dev -->|"git push"| Git
+    Git -->|"Trigger"| GHA
+    GHA -->|"SSH Deployment"| EC2
 
----
+    %% 2. 내부 로직
+    EC2 --- Role
+    EC2 -->|"Boto3 API Call"| AWSRes
 
-## 사용 기술
+    %% 3. ChatOps 과정
+    EC2 <-->|"Socket Mode (WebSocket)"| Slack
+    Slack <-->|"Notification / Command"| Chat
 
-- AWS EC2 (Elastic Compute Cloud)
-- Docker (컨테이너 실행 환경)
-- Python (운영 자동화 및 모니터링)
-- Terraform (Infrastructure as Code)
-
----
-
-## 디렉토리 구조
-
-```text
-devops-ops-automation-portfolio/
-├─ infra/        # Terraform (EC2 생성)
-├─ app/          # Docker 기반 애플리케이션
-├─ monitoring/   # Python 모니터링 스크립트
-├─ automation/   # 자동 조치 스크립트
-├─ scripts/      # start / stop / destroy
-├─ docs/         # Day별 정리 및 블로그 초안
-└─ README.md
+    %% 스타일링
+    style EC2 fill:#f9f,stroke:#333,stroke-width:2px
+    style GHA fill:#2088FF,stroke:#fff,color:#fff
+    style Slack fill:#4A154B,stroke:#fff,color:#fff
 ```
 
-## 왜 Kubernetes를 사용하지 않았는가
+## 📜 Project Overview
+1인 개발/운영 환경에서 **인프라 관리의 비효율을 제거**하기 위해 시작된 프로젝트입니다. 수동으로 콘솔에 접속하여 리소스를 점검하거나
+배포하는 과정을 **100% 자동화**하였습니다.
 
-Kubernetes는 이미 이전 포트폴리오에서 사용해봤다.
-이번 프로젝트에서는 오히려 추상화를 줄이고,
-운영 중 서버에서 실제로 어떤 일이 벌어지는지를 더 직접적으로 다루고 싶었다.
+### ✨ Key Features
+1. **IaC**
+   - Terraform을 사용하여 VPC, Subnet, EC2, IAM Role 등 전체 인프라를 코드로 정의하고 배포합니다.
+2. **Cost Optimization Bot**
+   - Boto3를 활용해 `Unused EBS Volumes`와 `Unassociated Elastic IPs`를 실시간으로 탐지합니다.
+3. **ChatOps(Interactive Control)**
+   - Slack Socket Mode를 통해 보안 그룹(Inbound) 개방 없이 안전하게 봇과 양방향 통신합니다.
+   - 명령어: `@OpsBot 점검` -> 리포트 발행.
+4. **Zero-Touch Deployment(CI/CD)**
+   - GitHub Actions를 구축하여 코드 Push 시 EC2 서버에 자동 배포 및 서비스 재시작을 수행합니다.
+5. **High Availability**
+   - Linux Systemd 서비스 등록을 통해 프로세스 비정상 종료 시 자동 복구(Auto-Restart)를 보장합니다.
+  
+## 🛠️ Tech Stack & Tools
+- **Infrastructure**: AWS(EC2, IAM, VPC), Terraform
+- **Automation**: Python 3.9, Boto3 SDK
+- **Interface**: Slack Bolt SDK(Socket Mode)
+- **CI/CD**: GitHub Actions, Linux Shell Script
+- **OS Management**: Amazon Linux 2023, Systemd
 
-DevOps에서 중요한 건 도구의 화려함이 아니라,
-문제를 인식하고 자동화로 풀어내는 능력이라고 생각한다.
+## 🚀 How to Run
+**1. 전제조건**
+- AWS Account & IAM User
+- Terraform Installed
+- Slack App Token(`xapp-...`) & Bot Token(`xoxb-...`)
+
+**2. IaC 설정**
+```bash
+cd terraform
+terraform init
+terraform plan
+terraform apply
+```
+
+**3. Application 설정 (On EC2)**
+```bash
+# Clone Repository
+git clone [https://github.com/lee951109/devops-ops-automation-portfolio.git](https://github.com/lee951109/devops-ops-automation-portfolio.git)
+
+# Install Dependencies
+pip3 install -r requirements.txt
+
+# Run Service (Systemd)
+sudo systemctl start opsbot.service
+```
+
+## Ahthor
+- **Name**: 이지현
+- **Role**: DevOps Engineer / Full Stack Developer
+- **Contact**: [GitHub Link](https://github.com/lee951109)
