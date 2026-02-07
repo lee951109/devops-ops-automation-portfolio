@@ -1,0 +1,32 @@
+name: Deploy OspBot to EC2
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SHH_KEY }}
+          port: 22
+          script: |
+            # 1. 프로젝트 폴더로 이동
+            cd ~/devops-ops-automation-portfolio
+            
+            # 2. 최신 코드 받기
+            git pull origin main
+            
+            # 3. 서비스 재시작 (봇 갱신)
+            sudo systemctl restart opsbot.service
+            
+            # 4. 상태 확인 (로그 출력)
+            systemctl status opsbot.service
