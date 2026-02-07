@@ -20,7 +20,7 @@ jobs:
           port: 22
           script: |
             # 1. 프로젝트 폴더로 이동
-            cd ~/devops-ops-automation-portfolio
+            cd /d/devops-ops-automation-portfolio
             
             # 2. 최신 코드 받기
             git pull origin main
